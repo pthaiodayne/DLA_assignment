@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assignment 1 | Text Classification Pipeline</title>
+  <link rel="stylesheet" href="../../styles/style.css" />
+  <style>
+    .page-stack {
+      display: grid;
+      gap: 20px;
+    }
+
+    .quick-links {
+      display: grid;
+      gap: 12px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .overview-item {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    .overview-item p {
+      margin: 0;
+    }
+
+    .overview-value {
+      margin-top: 8px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+
+    .inline-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.95em;
+    }
+
+    .switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .switch-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .switch-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .pipeline-nav {
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pipeline-nav.active {
+      display: flex;
+    }
+
+    .nav-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .nav-chip:hover {
+      text-decoration: none;
+      border-color: #c7d2fe;
+      background: #eef2ff;
+    }
+
+    .pipeline-panel {
+      display: none;
+    }
+
+    .pipeline-panel.active {
+      display: block;
+    }
+
+    .pipeline-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .sub-block {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fbfdff;
+    }
+
+    .sub-block h3,
+    .sub-block h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .sub-block p:last-child {
+      margin-bottom: 0;
+    }
+
+    .analysis-box {
+      padding: 14px 16px;
+      border-left: 4px solid var(--primary);
+      border-radius: 14px;
+      background: #eef2ff;
+    }
+
+    .analysis-box p {
+      margin: 0;
+    }
+
+    .analysis-box p + p {
+      margin-top: 8px;
+    }
+
+    .plain-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .plain-list li + li {
+      margin-top: 8px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .soft-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .data-example {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .data-example p {
+      margin: 0;
+    }
+
+    .data-example p + p {
+      margin-top: 10px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 16px;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .figure-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .figure-card h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .figure-card img {
+      display: block;
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      height: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    @media (max-width: 920px) {
+      .overview-grid,
+      .grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .overview-grid,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="sub-hero">
+    <div class="container">
+      <a class="back-link" href="../assignment1.html">← Assignment 1</a>
+      <p class="eyebrow">Assignment 1 / Text</p>
+      <h1>Text Classification Pipeline</h1>
+      <p class="hero-text">
+        Interactive summary extracted from
+        <span class="inline-code">DLA_Text_Classification.ipynb</span>.
+        The page separates the classical token-index pipeline for CNN/BiLSTM from the pretrained DistilBERT pipeline, and keeps the final model comparison in a standalone section.
+      </p>
+    </div>
+  </header>
+
+  <main class="container section-gap page-stack">
+    <section class="grid-2">
+      <article class="card">
+        <h2>Notebook Assets</h2>
+        <div class="quick-links">
+          <a class="resource-link" href="./DLA_Text_Classification.ipynb">Open source notebook</a>
+          <a class="resource-link" href="../assignment1.html">Back to assignment topics</a>
+        </div>
+        <div class="badge-row">
+          <span class="soft-badge">Dataset: emotion</span>
+          <span class="soft-badge">Classical branch: CNN + BiLSTM</span>
+          <span class="soft-badge">Transformer branch: DistilBERT</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Conclusion</h2>
+        <p>
+          The notebook compares three models: a simple TextCNN, a BiLSTM, and a DistilBERT. DistilBERT is the strongest model by a clear margin, which confirms the value of pretrained contextual representations for this emotion classification task. CNN is a strong lightweight baseline that outperforms BiLSTM in this experiment, but BiLSTM does not show enough of an advantage over CNN to justify its extra complexity.
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Project Snapshot</h2>
+      <div class="overview-grid">
+        <div class="overview-item">
+          <p>Dataset split</p>
+          <p class="overview-value">16000 / 2000 / 2000</p>
+        </div>
+        <div class="overview-item">
+          <p>Best model</p>
+          <p class="overview-value">DistilBERT</p>
+        </div>
+        <div class="overview-item">
+          <p>Fastest model</p>
+          <p class="overview-value">CNN</p>
+        </div>
+        <div class="overview-item">
+          <p>Label count</p>
+          <p class="overview-value">6</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Data Glimpse</h2>
+      <div class="data-example">
+        <p><strong>Input text:</strong> <span class="inline-code">i didnt feel humiliated</span></p>
+        <p><strong>Label id:</strong> <span class="inline-code">0</span></p>
+        <p><strong>Label name:</strong> <span class="inline-code">sadness</span></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Pipeline Selector</h2>
+      <div class="switcher">
+        <button id="btn-classical" class="switch-btn active" type="button">CNN / BiLSTM Pipeline</button>
+        <button id="btn-distilbert" class="switch-btn" type="button">DistilBERT Pipeline</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Quick Navigation</h2>
+      <div id="nav-classical" class="pipeline-nav active">
+        <a class="nav-chip" href="#classical-input">Text Input</a>
+        <a class="nav-chip" href="#classical-preprocess">Data Preprocessing</a>
+        <a class="nav-chip" href="#classical-cnn-prep">CNN Preparation</a>
+        <a class="nav-chip" href="#classical-rnn-prep">RNN Preparation</a>
+        <a class="nav-chip" href="#classical-encoding">Encoding And DataLoader</a>
+        <a class="nav-chip" href="#classical-cnn-model">CNN Backbone</a>
+        <a class="nav-chip" href="#classical-rnn-model">BiLSTM Backbone</a>
+        <a class="nav-chip" href="#classical-training">Training And Evaluation</a>
+      </div>
+      <div id="nav-distilbert" class="pipeline-nav">
+        <a class="nav-chip" href="#distilbert-input">Text Input</a>
+        <a class="nav-chip" href="#distilbert-tokenization">Tokenizer</a>
+        <a class="nav-chip" href="#distilbert-metrics">Metrics</a>
+        <a class="nav-chip" href="#distilbert-strategies">Fine-tuning Strategies</a>
+        <a class="nav-chip" href="#distilbert-training">Training Setup</a>
+        <a class="nav-chip" href="#distilbert-result">Final DistilBERT Result</a>
+        <a class="nav-chip" href="#distilbert-strategy-compare">Strategy Compare</a>
+      </div>
+    </section>
+
+    <section id="pipeline-classical" class="card pipeline-panel active">
+      <h2>Shared Pipeline For CNN And BiLSTM</h2>
+      <div class="pipeline-stack">
+        <div id="classical-input" class="sub-block">
+          <h3>Text Input</h3>
+          <p>
+            Both CNN and BiLSTM start from the same raw dataset. The notebook loads
+            <span class="inline-code">emotion</span>,
+            extracts the raw text field, and keeps the official train, validation, and test split unchanged.
+          </p>
+          <pre><code>dataset = load_dataset("emotion")
+print(dataset["train"][0])
+print(dataset["train"].features)</code></pre>
+          <div class="analysis-box">
+            <p>
+              This shared starting point matters because it keeps the experiment fair. Both classical models are trained and evaluated on exactly the same data partitions.
+            </p>
+          </div>
+        </div>
+
+        <div id="classical-preprocess" class="sub-block">
+          <h3>Data Preprocessing</h3>
+          <p>
+            The notebook lowercases text, removes punctuation, normalizes spaces, and tokenizes by whitespace. This same cleaning logic is reused in both CNN and RNN branches.
+          </p>
+          <pre><code>def clean_text(text):
+    text = text.lower()
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+def tokenize(text):
+    return text.split()</code></pre>
+          <div class="analysis-box">
+            <p>
+              This pipeline is intentionally lightweight. It simplifies vocabulary construction, but it also discards punctuation and pretrained token structure, which limits expressive power compared with DistilBERT.
+            </p>
+          </div>
+        </div>
+
+        <div id="classical-cnn-prep" class="sub-block">
+          <h3>CNN Preparation</h3>
+          <pre><code>train_texts_cnn = [clean_text(t) for t in train_texts]
+val_texts_cnn   = [clean_text(t) for t in val_texts]
+test_texts_cnn  = [clean_text(t) for t in test_texts]
+
+counter = Counter()
+for text in train_texts_cnn:
+    counter.update(tokenize(text))
+
+max_vocab_size = 20000
+special_tokens = ["&lt;PAD&gt;", "&lt;UNK&gt;"]</code></pre>
+          <p>
+            CNN uses a custom vocabulary with a size cap and explicit
+            <span class="inline-code">&lt;PAD&gt;</span> /
+            <span class="inline-code">&lt;UNK&gt;</span>
+            handling, then short fixed-length sequences.
+          </p>
+        </div>
+
+        <div id="classical-rnn-prep" class="sub-block">
+          <h3>RNN Preparation</h3>
+          <pre><code>train_texts_rnn = [clean_text(text) for text in train_texts]
+val_texts_rnn = [clean_text(text) for text in val_texts]
+test_texts_rnn = [clean_text(text) for text in test_texts]
+
+rnn_vocab = build_vocab(train_texts_rnn, min_freq=2)
+rnn_max_len = max(len(text.split()) for text in train_texts_rnn)</code></pre>
+          <p>
+            BiLSTM keeps a separate vocabulary and uses
+            <span class="inline-code">min_freq = 2</span>
+            to remove very rare words. This makes the RNN branch self-contained and slightly more conservative.
+          </p>
+        </div>
+
+        <div id="classical-encoding" class="sub-block">
+          <h3>Encoding And DataLoader</h3>
+          <pre><code>def encode_text(text, vocab):
+    return [vocab.get(tok, vocab["&lt;UNK&gt;"]) for tok in tokenize(text)]
+
+lengths = [len(x) for x in train_encoded]
+max_len = min(50, max(lengths))
+
+train_loader_cnn = DataLoader(train_ds_cnn, batch_size=64, shuffle=True)
+train_loader_rnn = DataLoader(train_dataset_rnn, batch_size=64, shuffle=True)</code></pre>
+          <div class="analysis-box">
+            <p>
+              This is the shared numerical representation stage: raw strings become padded integer tensors. CNN and BiLSTM diverge only after this representation step.
+            </p>
+          </div>
+        </div>
+
+        <div id="classical-cnn-model" class="sub-block">
+          <h3>CNN Backbone</h3>
+          <pre><code>class TextCNN(nn.Module):
+    def __init__(self, vocab_size, embed_dim, num_classes, filter_sizes=[3,4,5], num_filters=100, dropout=0.5):
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.convs = nn.ModuleList([
+            nn.Conv1d(in_channels=embed_dim, out_channels=num_filters, kernel_size=fs)
+            for fs in filter_sizes
+        ])</code></pre>
+          <p>
+            TextCNN captures short phrase patterns well, which is why it remains competitive for emotion cues even with a simple representation pipeline.
+          </p>
+        </div>
+
+        <div id="classical-rnn-model" class="sub-block">
+          <h3>BiLSTM Backbone</h3>
+          <pre><code>class BiLSTMClassifier(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes, num_layers=1, dropout=0.5):
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.lstm = nn.LSTM(
+            input_size=embed_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True
+        )</code></pre>
+          <p>
+            BiLSTM emphasizes bidirectional sequence context. In theory it should capture order better than CNN, but in this notebook that advantage is not enough to beat the simpler CNN baseline.
+          </p>
+        </div>
+
+        <div id="classical-training" class="sub-block">
+          <h3>Training And Evaluation</h3>
+          <pre><code>def train_one_epoch_cnn(model, loader, optimizer, criterion, device):
+    model.train()
+    ...
+
+@torch.no_grad()
+def evaluate_cnn(model, loader, criterion, device):
+    model.eval()
+    ...
+    acc = accuracy_score(all_labels, all_preds)
+    f1 = f1_score(all_labels, all_preds, average="macro")</code></pre>
+          <div class="analysis-box">
+            <p>
+              The same training/evaluation structure is reused for CNN and BiLSTM, so the result comparison is consistent across metrics and procedure.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pipeline-distilbert" class="card pipeline-panel">
+      <h2>Separate Pipeline For DistilBERT</h2>
+      <div class="pipeline-stack">
+        <div id="distilbert-input" class="sub-block">
+          <h3>Text Input</h3>
+          <p>
+            DistilBERT still starts from the same raw
+            <span class="inline-code">emotion</span>
+            dataset, but unlike CNN and BiLSTM, it keeps the text closer to its original form and delegates input processing to the pretrained tokenizer.
+          </p>
+        </div>
+
+        <div id="distilbert-tokenization" class="sub-block">
+          <h3>Tokenizer</h3>
+          <p>
+            DistilBERT does not reuse the handcrafted vocabulary of CNN/BiLSTM. It uses
+            <span class="inline-code">distilbert-base-uncased</span>
+            and tokenizes raw text directly through the pretrained tokenizer.
+          </p>
+          <pre><code>checkpoint = "distilbert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+
+def tokenize_function(example):
+    return tokenizer(example["text"], truncation=True)
+
+tokenized_dataset = dataset.map(tokenize_function, batched=True)
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer)</code></pre>
+          <div class="analysis-box">
+            <p>
+              This is the key reason DistilBERT forms a separate pipeline. It relies on pretrained subword segmentation and contextual encoding instead of scratch-built token IDs.
+            </p>
+          </div>
+        </div>
+
+        <div id="distilbert-metrics" class="sub-block">
+          <h3>Metrics</h3>
+          <pre><code>accuracy_metric = evaluate.load("accuracy")
+f1_metric = evaluate.load("f1")
+
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)
+    return {
+        "accuracy": accuracy_metric.compute(predictions=predictions, references=labels)["accuracy"],
+        "f1_macro": f1_metric.compute(predictions=predictions, references=labels, average="macro")["f1"]
+    }</code></pre>
+          <p>
+            Accuracy and macro F1 are both computed explicitly, making it possible to compare transformer runs not only by overall correctness but also by class-balanced performance.
+          </p>
+        </div>
+
+        <div id="distilbert-strategies" class="sub-block">
+          <h3>Fine-tuning Strategies</h3>
+          <p>
+            The notebook tries three strategies:
+            freeze backbone, partial fine-tune, and full fine-tune.
+          </p>
+          <pre><code>TRANSFORMER_STRATEGIES = [
+    ("freeze_backbone", "DistilBERT (Freeze Backbone)"),
+    ("partial_finetune", "DistilBERT (Partial Fine-tune)"),
+    ("full_finetune", "DistilBERT (Full Fine-tune)")
+]</code></pre>
+          <pre><code>def build_distilbert_model(strategy_key):
+    model = AutoModelForSequenceClassification.from_pretrained(
+        checkpoint,
+        num_labels=num_classes,
+        id2label=id2label,
+        label2id=label2id
+    )
+
+    if strategy_key == "freeze_backbone":
+        for param in model.distilbert.parameters():
+            param.requires_grad = False
+
+    elif strategy_key == "partial_finetune":
+        for param in model.distilbert.parameters():
+            param.requires_grad = False
+        for param in model.distilbert.transformer.layer[-1].parameters():
+            param.requires_grad = True</code></pre>
+          <div class="analysis-box">
+            <p>
+              This makes the transformer section more rigorous than a single fine-tuning run. The notebook evaluates how much of the pretrained model actually needs to be trainable, and full fine-tuning still gives the strongest final result.
+            </p>
+          </div>
+        </div>
+
+        <div id="distilbert-training" class="sub-block">
+          <h3>Training Setup</h3>
+          <pre><code>def build_training_args(run_name):
+    return TrainingArguments(
+        output_dir=f"./emotion_distilbert_{run_name}",
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        logging_strategy="epoch",
+        learning_rate=2e-5,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=3,
+        weight_decay=0.01,
+        load_best_model_at_end=True,
+        metric_for_best_model="f1_macro"
+    )</code></pre>
+          <p>
+            The checkpoint is selected by
+            <span class="inline-code">f1_macro</span>,
+            which is a strong choice when emotion classes should be treated more evenly than by plain accuracy.
+          </p>
+        </div>
+
+        <div id="distilbert-result" class="sub-block">
+          <h3>Final DistilBERT Result</h3>
+          <p>
+            The best DistilBERT configuration in the notebook reaches
+            <span class="inline-code">Test Accuracy = 0.9270</span> and
+            <span class="inline-code">Test Macro F1 = 0.8796</span>.
+          </p>
+          <div class="analysis-box">
+            <p>
+              This confirms that the largest gain in the notebook comes from moving to pretrained contextual representations rather than only changing the scratch-trained backbone from CNN to BiLSTM.
+            </p>
+          </div>
+        </div>
+
+        <div id="distilbert-strategy-compare" class="sub-block">
+          <h3>DistilBERT Strategy Compare</h3>
+          <p>
+            The notebook also compares the three transformer strategies directly before selecting the one used for the rest of the analysis.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Strategy</th>
+                  <th>Trainable Params</th>
+                  <th>Val Acc</th>
+                  <th>Val Macro F1</th>
+                  <th>Test Acc</th>
+                  <th>Test Macro F1</th>
+                  <th>Training Time (sec)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DistilBERT (Full Fine-tune)</td>
+                  <td>66,958,086</td>
+                  <td>0.9410</td>
+                  <td>0.9177</td>
+                  <td>0.9270</td>
+                  <td>0.8796</td>
+                  <td>269.81</td>
+                </tr>
+                <tr>
+                  <td>DistilBERT (Partial Fine-tune)</td>
+                  <td>7,683,078</td>
+                  <td>0.8445</td>
+                  <td>0.8121</td>
+                  <td>0.8340</td>
+                  <td>0.7764</td>
+                  <td>90.23</td>
+                </tr>
+                <tr>
+                  <td>DistilBERT (Freeze Backbone)</td>
+                  <td>595,206</td>
+                  <td>0.5020</td>
+                  <td>0.2048</td>
+                  <td>0.4950</td>
+                  <td>0.2006</td>
+                  <td>113.18</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="analysis-box">
+            <p>
+              The strategy comparison shows a clear pattern: full fine-tuning is the only variant that fully unlocks DistilBERT on this task. Partial fine-tuning saves parameters but loses too much predictive quality, and freezing the backbone performs very poorly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Visual Evidence From The Notebook</h2>
+      <p>
+        The notebook includes confusion matrices for all three main models. These figures make the conclusion easier to trust because they show not only aggregate scores, but also where each model confuses emotion classes.
+      </p>
+      <div class="figure-grid">
+        <figure class="figure-card">
+          <h3>CNN Confusion Matrix</h3>
+          <img src="./assets/confusion_matrix_1.png" alt="CNN confusion matrix from the notebook" />
+        </figure>
+        <figure class="figure-card">
+          <h3>BiLSTM Confusion Matrix</h3>
+          <img src="./assets/confusion_matrix_2.png" alt="BiLSTM confusion matrix from the notebook" />
+        </figure>
+        <figure class="figure-card">
+          <h3>DistilBERT Confusion Matrix</h3>
+          <img src="./assets/confusion_matrix_3.png" alt="DistilBERT confusion matrix from the notebook" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Final Comparison Of CNN, BiLSTM, And DistilBERT</h2>
+      <div class="sub-block">
+        <h3>Comparison code in the notebook</h3>
+        <pre><code>comparison_df = pd.DataFrame([
+    {
+        "Model": "CNN",
+        "Test Accuracy": cnn_test_acc,
+        "Test Macro F1": cnn_test_f1,
+        "Training Time (sec)": cnn_train_time
+    },
+    {
+        "Model": "BiLSTM",
+        "Test Accuracy": bilstm_test_acc,
+        "Test Macro F1": bilstm_test_f1,
+        "Training Time (sec)": bilstm_train_time
+    },
+    {
+        "Model": "DistilBERT",
+        "Test Accuracy": transformer_test_acc,
+        "Test Macro F1": transformer_test_f1,
+        "Training Time (sec)": transformer_train_time
+    }
+]).sort_values(by=["Test Macro F1", "Test Accuracy"], ascending=False)</code></pre>
+      </div>
+
+      <div class="sub-block">
+        <h3>Final comparison table</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Test Accuracy</th>
+                <th>Test Macro F1</th>
+                <th>Training Time (sec)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>DistilBERT</td>
+                <td>0.9270</td>
+                <td>0.8796</td>
+                <td>269.81</td>
+              </tr>
+              <tr>
+                <td>CNN</td>
+                <td>0.8995</td>
+                <td>0.8513</td>
+                <td>15.85</td>
+              </tr>
+              <tr>
+                <td>BiLSTM</td>
+                <td>0.8810</td>
+                <td>0.8381</td>
+                <td>80.23</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sub-block">
+        <h3>Conclusion from the comparison</h3>
+        <div class="analysis-box">
+          <p>
+            DistilBERT is best on both accuracy and macro F1, so it is the strongest final model in this notebook.
+          </p>
+          <p>
+            CNN is by far the fastest model and remains surprisingly competitive, which makes it the best lightweight baseline.
+          </p>
+          <p>
+            BiLSTM adds a sequence-aware comparison point, but in this experiment it does not outperform CNN and stays clearly behind DistilBERT.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const btnClassical = document.getElementById('btn-classical');
+    const btnDistilbert = document.getElementById('btn-distilbert');
+    const panelClassical = document.getElementById('pipeline-classical');
+    const panelDistilbert = document.getElementById('pipeline-distilbert');
+    const navClassical = document.getElementById('nav-classical');
+    const navDistilbert = document.getElementById('nav-distilbert');
+
+    function showPipeline(mode) {
+      const showClassical = mode === 'classical';
+      panelClassical.classList.toggle('active', showClassical);
+      panelDistilbert.classList.toggle('active', !showClassical);
+      navClassical.classList.toggle('active', showClassical);
+      navDistilbert.classList.toggle('active', !showClassical);
+      btnClassical.classList.toggle('active', showClassical);
+      btnDistilbert.classList.toggle('active', !showClassical);
+    }
+
+    btnClassical.addEventListener('click', () => showPipeline('classical'));
+    btnDistilbert.addEventListener('click', () => showPipeline('distilbert'));
+  </script>
+</body>
+</html>
