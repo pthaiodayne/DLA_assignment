@@ -6,44 +6,42 @@
   <title>Assignment 1 | Text Classification Pipeline</title>
   <link rel="stylesheet" href="../../styles/style.css" />
   <style>
-    .page-stack {
-      display: grid;
-      gap: 20px;
+    :root {
+      --code-bg: #0b1220;
+      --code-surface: #111827;
+      --code-border: rgba(148, 163, 184, 0.18);
+      --code-text: #dbe7ff;
+      --code-muted: #94a3b8;
+      --code-accent: #7dd3fc;
     }
 
-    .quick-links {
-      display: grid;
-      gap: 12px;
+    .container {
+      width: min(1280px, calc(100% - 32px));
     }
 
-    .overview-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
+    .sub-hero {
+      padding: clamp(56px, 8vw, 88px) 0 clamp(40px, 6vw, 64px);
     }
 
-    .overview-item {
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: #f8fafc;
+    .sub-hero .back-link,
+    .sub-hero .eyebrow,
+    .sub-hero h1,
+    .sub-hero .hero-text {
+      max-width: none;
     }
 
-    .overview-item p {
-      margin: 0;
+    .sub-hero h1 {
+      width: min(100%, 12ch);
+      margin-bottom: 16px;
+      font-size: clamp(2.3rem, 4.8vw, 4.4rem);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
     }
 
-    .overview-value {
-      margin-top: 8px;
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--primary);
-      line-height: 1.2;
-    }
-
-    .inline-code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.95em;
+    .sub-hero .hero-text {
+      width: min(100%, 92ch);
+      font-size: clamp(1rem, 0.55vw + 0.95rem, 1.16rem);
+      line-height: 1.75;
     }
 
     .switcher {
@@ -112,153 +110,215 @@
       gap: 16px;
     }
 
-    .sub-block {
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: #fbfdff;
-    }
-
-    .sub-block h3,
-    .sub-block h4 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    .sub-block p:last-child {
-      margin-bottom: 0;
-    }
-
-    .analysis-box {
-      padding: 14px 16px;
-      border-left: 4px solid var(--primary);
-      border-radius: 14px;
-      background: #eef2ff;
-    }
-
-    .analysis-box p {
-      margin: 0;
-    }
-
-    .analysis-box p + p {
-      margin-top: 8px;
-    }
-
-    .plain-list {
-      margin: 0;
-      padding-left: 18px;
-    }
-
-    .plain-list li + li {
-      margin-top: 8px;
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .soft-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #e2e8f0;
-      color: #334155;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .data-example {
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: #ffffff;
-      box-shadow: var(--shadow);
-    }
-
-    .data-example p {
-      margin: 0;
-    }
-
-    .data-example p + p {
-      margin-top: 10px;
-    }
-
     pre {
       margin: 0;
-      padding: 16px;
+      position: relative;
+      padding: 52px 18px 18px;
       overflow-x: auto;
-      border-radius: 16px;
-      background: #0f172a;
-      color: #e2e8f0;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      border: 1px solid var(--code-border);
+      background:
+        linear-gradient(180deg, rgba(148, 163, 184, 0.08) 0, rgba(148, 163, 184, 0.08) 38px, transparent 38px),
+        linear-gradient(180deg, var(--code-surface) 0%, var(--code-bg) 100%);
+      color: var(--code-text);
+      font-size: clamp(0.84rem, 0.18vw + 0.8rem, 0.96rem);
+      line-height: 1.7;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+        0 16px 32px rgba(15, 23, 42, 0.16);
+      scrollbar-color: rgba(125, 211, 252, 0.6) rgba(15, 23, 42, 0.3);
+      scrollbar-width: thin;
+    }
+
+    pre::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fb7185;
+      box-shadow: 18px 0 0 #fbbf24, 36px 0 0 #34d399;
+    }
+
+    pre::after {
+      content: "notebook / code";
+      position: absolute;
+      top: 11px;
+      right: 16px;
+      color: var(--code-muted);
+      font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
     }
 
     code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
     }
 
-    .figure-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .figure-card {
-      padding: 18px;
-      border: 1px solid var(--border);
+    .table-wrap {
+      margin-top: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
       border-radius: 18px;
-      background: #fff;
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
-    .figure-card h3 {
-      margin-top: 0;
-      margin-bottom: 12px;
+    table {
+      min-width: 680px;
+      table-layout: auto;
     }
 
-    .figure-card img {
-      display: block;
-      width: 100%;
-      max-width: 760px;
-      margin: 0 auto;
-      height: auto;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: #fff;
+    th,
+    td {
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
     }
 
-    @media (max-width: 920px) {
-      .overview-grid,
-      .grid-2 {
-        grid-template-columns: 1fr 1fr;
+    td:first-child,
+    th:first-child {
+      position: sticky;
+      left: 0;
+      background: inherit;
+      z-index: 1;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover td {
+      background: #f8fbff;
+    }
+
+    .max-cell {
+      color: inherit;
+      font-weight: inherit;
+    }
+
+    .max-value {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.18rem 0.5rem;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+      color: #1d4ed8;
+      font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.22);
+    }
+
+    .card > p,
+    .sub-block > p,
+    .analysis-box p,
+    .plain-list li {
+      max-width: none;
+    }
+
+    @media (min-width: 1280px) {
+      .pipeline-stack {
+        gap: 20px;
       }
     }
 
+    @media (max-width: 1120px) {
+      .container {
+        width: min(1180px, calc(100% - 24px));
+      }
+    }
+
+    @media (max-width: 920px) {
+    }
+
     @media (max-width: 720px) {
-      .overview-grid,
-      .grid-2 {
-        grid-template-columns: 1fr;
+      .container {
+        width: calc(100% - 18px);
+      }
+
+      .hero-content {
+        text-align: center;
+        margin-inline: auto;
+      }
+
+      .sub-hero .back-link {
+        display: inline-flex;
+        justify-content: center;
+        margin-inline: auto;
+      }
+
+      .sub-hero h1 {
+        width: 100%;
+        font-size: clamp(2rem, 9vw, 2.8rem);
+        line-height: 1.1;
+      }
+
+      .sub-hero .hero-text {
+        width: 100%;
+        line-height: 1.68;
+        margin-inline: auto;
+      }
+
+      .sub-hero .eyebrow {
+        justify-content: center;
+      }
+
+      .switch-btn,
+      .nav-chip {
+        width: 100%;
+        justify-content: center;
+      }
+
+      pre {
+        padding: 48px 14px 16px;
+        border-radius: 16px;
+        font-size: 0.84rem;
+      }
+
+      pre::after {
+        right: 12px;
+        font-size: 0.72rem;
+      }
+
+      table {
+        min-width: 560px;
+      }
+
+      th,
+      td {
+        padding: 10px 12px;
+        font-size: 0.92rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero-text {
+        font-size: 0.98rem;
+      }
+
+      table {
+        min-width: 520px;
       }
     }
   </style>
 </head>
 <body>
   <header class="sub-hero">
-    <div class="container">
-      <a class="back-link" href="../assignment1.html">← Assignment 1</a>
-      <p class="eyebrow">Assignment 1 / Text</p>
-      <h1>Text Classification Pipeline</h1>
-      <p class="hero-text">
-        Interactive summary extracted from
-        <span class="inline-code">DLA_Text_Classification.ipynb</span>.
-        The page separates the classical token-index pipeline for CNN/BiLSTM from the pretrained DistilBERT pipeline, and keeps the final model comparison in a standalone section.
-      </p>
+    <div class="hero-shell">
+      <div class="hero-content">
+        <a class="back-link" href="../assignment1.html">← Assignment 1</a>
+        <p class="eyebrow">Assignment 1 / Text</p>
+        <h1>Text Classification Pipeline</h1>
+        <p class="hero-text">
+          Interactive summary extracted from
+          <span class="inline-code">DLA_Text_Classification.ipynb</span>.
+          The page separates the classical token-index pipeline for CNN/BiLSTM from the pretrained DistilBERT pipeline, and keeps the final model comparison in a standalone section.
+        </p>
+      </div>
     </div>
   </header>
 
@@ -281,6 +341,7 @@
         <h2>Conclusion</h2>
         <p>
           The notebook compares three models: a simple TextCNN, a BiLSTM, and a DistilBERT. DistilBERT is the strongest model by a clear margin, which confirms the value of pretrained contextual representations for this emotion classification task. CNN is a strong lightweight baseline that outperforms BiLSTM in this experiment, but BiLSTM does not show enough of an advantage over CNN to justify its extra complexity.
+        </p>
       </article>
     </section>
 
@@ -312,6 +373,194 @@
         <p><strong>Input text:</strong> <span class="inline-code">i didnt feel humiliated</span></p>
         <p><strong>Label id:</strong> <span class="inline-code">0</span></p>
         <p><strong>Label name:</strong> <span class="inline-code">sadness</span></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Exploratory Data Analysis From The Notebook</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Dataset Split And Class Distribution</h3>
+          <p>
+            The notebook first checks whether the official
+            <span class="inline-code">emotion</span>
+            split is balanced enough for comparison. The split sizes are stable, but the class distribution is clearly imbalanced, especially for
+            <span class="inline-code">surprise</span>
+            and
+            <span class="inline-code">love</span>.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Split</th>
+                  <th>Samples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Train</td>
+                  <td>16000</td>
+                </tr>
+                <tr>
+                  <td>Validation</td>
+                  <td>2000</td>
+                </tr>
+                <tr>
+                  <td>Test</td>
+                  <td>2000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Label</th>
+                  <th>Train</th>
+                  <th>Validation</th>
+                  <th>Test</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>sadness</td>
+                  <td>4666</td>
+                  <td>550</td>
+                  <td>581</td>
+                </tr>
+                <tr>
+                  <td>joy</td>
+                  <td>5362</td>
+                  <td>704</td>
+                  <td>695</td>
+                </tr>
+                <tr>
+                  <td>love</td>
+                  <td>1304</td>
+                  <td>178</td>
+                  <td>159</td>
+                </tr>
+                <tr>
+                  <td>anger</td>
+                  <td>2159</td>
+                  <td>275</td>
+                  <td>275</td>
+                </tr>
+                <tr>
+                  <td>fear</td>
+                  <td>1937</td>
+                  <td>212</td>
+                  <td>224</td>
+                </tr>
+                <tr>
+                  <td>surprise</td>
+                  <td>572</td>
+                  <td>81</td>
+                  <td>66</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <h3>Text Length Summary</h3>
+          <p>
+            Length statistics are very consistent across train, validation, and test. That means model comparison is not distorted by one split containing much longer texts than the others.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Split</th>
+                  <th>Mean Words</th>
+                  <th>Median Words</th>
+                  <th>Max Words</th>
+                  <th>Mean Chars</th>
+                  <th>Median Chars</th>
+                  <th>Max Chars</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Train</td>
+                  <td>19.17</td>
+                  <td>17</td>
+                  <td>66</td>
+                  <td>96.85</td>
+                  <td>86</td>
+                  <td>300</td>
+                </tr>
+                <tr>
+                  <td>Validation</td>
+                  <td>18.87</td>
+                  <td>17</td>
+                  <td>61</td>
+                  <td>95.35</td>
+                  <td>85</td>
+                  <td>295</td>
+                </tr>
+                <tr>
+                  <td>Test</td>
+                  <td>19.15</td>
+                  <td>17</td>
+                  <td>61</td>
+                  <td>96.59</td>
+                  <td>86</td>
+                  <td>296</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Label</th>
+                  <th>Average Words In Train Split</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>sadness</td>
+                  <td>18.36</td>
+                </tr>
+                <tr>
+                  <td>joy</td>
+                  <td>19.50</td>
+                </tr>
+                <tr>
+                  <td>love</td>
+                  <td>20.70</td>
+                </tr>
+                <tr>
+                  <td>anger</td>
+                  <td>19.23</td>
+                </tr>
+                <tr>
+                  <td>fear</td>
+                  <td>18.84</td>
+                </tr>
+                <tr>
+                  <td>surprise</td>
+                  <td>19.97</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <h3>Main EDA Takeaways</h3>
+          <ul class="plain-list">
+            <li>The split sizes are clean and consistent: 16000 for training, 2000 for validation, and 2000 for testing.</li>
+            <li>The dataset is imbalanced, so macro F1 is necessary in addition to accuracy.</li>
+            <li>Text length is short and stable across splits, which suits both classical sequence models and DistilBERT.</li>
+            <li><span class="inline-code">surprise</span> is the smallest class by a large margin, so weaker per-label scores on that class are expected.</li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -672,10 +921,7 @@ def compute_metrics(eval_pred):
     </section>
 
     <section class="card">
-      <h2>Visual Evidence From The Notebook</h2>
-      <p>
-        The notebook includes confusion matrices for all three main models. These figures make the conclusion easier to trust because they show not only aggregate scores, but also where each model confuses emotion classes.
-      </p>
+      <h2>Confusion Matrices</h2>
       <div class="figure-grid">
         <figure class="figure-card">
           <h3>CNN Confusion Matrix</h3>
@@ -693,29 +939,19 @@ def compute_metrics(eval_pred):
     </section>
 
     <section class="card">
-      <h2>Final Comparison Of CNN, BiLSTM, And DistilBERT</h2>
+      <h2>Comparison Of CNN, BiLSTM, And DistilBERT</h2>
       <div class="sub-block">
         <h3>Comparison code in the notebook</h3>
-        <pre><code>comparison_df = pd.DataFrame([
-    {
-        "Model": "CNN",
-        "Test Accuracy": cnn_test_acc,
-        "Test Macro F1": cnn_test_f1,
-        "Training Time (sec)": cnn_train_time
-    },
-    {
-        "Model": "BiLSTM",
-        "Test Accuracy": bilstm_test_acc,
-        "Test Macro F1": bilstm_test_f1,
-        "Training Time (sec)": bilstm_train_time
-    },
-    {
-        "Model": "DistilBERT",
-        "Test Accuracy": transformer_test_acc,
-        "Test Macro F1": transformer_test_f1,
-        "Training Time (sec)": transformer_train_time
-    }
-]).sort_values(by=["Test Macro F1", "Test Accuracy"], ascending=False)</code></pre>
+        <pre><code>overall_comparison_df = pd.DataFrame([
+    summarize_model("TextCNN", cnn_y_true, cnn_y_pred, cnn_train_time),
+    summarize_model("BiLSTM", bilstm_y_true, bilstm_y_pred, bilstm_train_time),
+    summarize_model(
+        best_transformer_strategy_label,
+        transformer_y_true,
+        transformer_y_pred,
+        transformer_train_time
+    )
+]).sort_values(by=["Macro F1", "Accuracy"], ascending=False)</code></pre>
       </div>
 
       <div class="sub-block">
@@ -725,6 +961,8 @@ def compute_metrics(eval_pred):
             <thead>
               <tr>
                 <th>Model</th>
+                <th>Precision</th>
+                <th>Recall</th>
                 <th>Test Accuracy</th>
                 <th>Test Macro F1</th>
                 <th>Training Time (sec)</th>
@@ -732,25 +970,125 @@ def compute_metrics(eval_pred):
             </thead>
             <tbody>
               <tr>
-                <td>DistilBERT</td>
+                <td>DistilBERT (Full Fine-tune)</td>
+                <td>0.8947</td>
+                <td>0.8710</td>
                 <td>0.9270</td>
                 <td>0.8796</td>
-                <td>269.81</td>
+                <td>308.72</td>
               </tr>
               <tr>
-                <td>CNN</td>
+                <td>TextCNN</td>
+                <td>0.8528</td>
+                <td>0.8487</td>
                 <td>0.8995</td>
-                <td>0.8513</td>
-                <td>15.85</td>
+                <td>0.8511</td>
+                <td>17.96</td>
               </tr>
               <tr>
                 <td>BiLSTM</td>
+                <td>0.8294</td>
+                <td>0.8468</td>
                 <td>0.8810</td>
                 <td>0.8381</td>
-                <td>80.23</td>
+                <td>66.40</td>
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div class="sub-block">
+        <h3>F1-score By Label</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>BiLSTM</th>
+                <th>DistilBERT</th>
+                <th>TextCNN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>sadness</td>
+                <td>0.9195</td>
+                <td>0.9624</td>
+                <td>0.9345</td>
+              </tr>
+              <tr>
+                <td>joy</td>
+                <td>0.9164</td>
+                <td>0.9475</td>
+                <td>0.9222</td>
+              </tr>
+              <tr>
+                <td>love</td>
+                <td>0.7644</td>
+                <td>0.8323</td>
+                <td>0.7843</td>
+              </tr>
+              <tr>
+                <td>anger</td>
+                <td>0.8381</td>
+                <td>0.9288</td>
+                <td>0.8974</td>
+              </tr>
+              <tr>
+                <td>fear</td>
+                <td>0.8629</td>
+                <td>0.8946</td>
+                <td>0.8700</td>
+              </tr>
+              <tr>
+                <td>surprise</td>
+                <td>0.7273</td>
+                <td>0.7119</td>
+                <td>0.6780</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="analysis-box">
+          <p>
+            DistilBERT is strongest on most labels, especially
+            <span class="inline-code">sadness</span>,
+            <span class="inline-code">joy</span>,
+            and
+            <span class="inline-code">anger</span>.
+          </p>
+          <p>
+            All models struggle more on
+            <span class="inline-code">surprise</span>,
+            which matches the EDA finding that it is the smallest class in the dataset.
+          </p>
+        </div>
+      </div>
+
+      <div class="sub-block">
+        <h3>Learning Curve</h3>
+        <p>
+          CNN and BiLSTM were trained for 8 epochs, while the selected DistilBERT strategy was trained for 3 epochs.
+        </p>
+        <div class="figure-grid">
+          <figure class="figure-card">
+            <h4>Validation Accuracy Across Epochs</h4>
+            <img src="./assets/learning_curve_val_accuracy.png" alt="Validation accuracy learning curve from the notebook for TextCNN, BiLSTM, and DistilBERT" />
+          </figure>
+          <figure class="figure-card">
+            <h4>Validation Macro F1 Across Epochs</h4>
+            <img src="./assets/learning_curve_val_macro_f1.png" alt="Validation macro F1 learning curve from the notebook for TextCNN, BiLSTM, and DistilBERT" />
+          </figure>
+          <figure class="figure-card">
+            <h4>Train And Validation Loss Curves</h4>
+            <img src="./assets/learning_curve_train_val_loss.png" alt="Train and validation loss learning curves from the notebook for TextCNN, BiLSTM, and DistilBERT" />
+          </figure>
+        </div>
+        <div class="analysis-box">
+          <p>
+            The plots show the same pattern as the final metrics: DistilBERT reaches a much higher validation ceiling early, while TextCNN ends up slightly stronger than BiLSTM among the classical models.
+          </p>
         </div>
       </div>
 
@@ -791,6 +1129,51 @@ def compute_metrics(eval_pred):
 
     btnClassical.addEventListener('click', () => showPipeline('classical'));
     btnDistilbert.addEventListener('click', () => showPipeline('distilbert'));
+
+    function parseNumericCell(text) {
+      const cleaned = text.replace(/,/g, '').trim();
+      if (!cleaned || cleaned === '-') return null;
+      if (!/^[-+]?\d*\.?\d+$/.test(cleaned)) return null;
+      return Number(cleaned);
+    }
+
+    function highlightColumnMaxima() {
+      document.querySelectorAll('table').forEach((table) => {
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        if (!rows.length) return;
+
+        const columnCount = Math.max(...rows.map((row) => row.children.length));
+
+        for (let colIndex = 1; colIndex < columnCount; colIndex += 1) {
+          const numericCells = rows
+            .map((row) => row.children[colIndex])
+            .filter(Boolean)
+            .map((cell) => ({
+              cell,
+              value: parseNumericCell(cell.textContent)
+            }))
+            .filter((entry) => entry.value !== null);
+
+          if (!numericCells.length) continue;
+
+          const maxValue = Math.max(...numericCells.map((entry) => entry.value));
+          numericCells.forEach(({ cell, value }) => {
+            if (value === maxValue) {
+              cell.classList.add('max-cell');
+              if (!cell.querySelector('.max-value')) {
+                const badge = document.createElement('span');
+                badge.className = 'max-value';
+                badge.textContent = cell.textContent.trim();
+                cell.textContent = '';
+                cell.appendChild(badge);
+              }
+            }
+          });
+        }
+      });
+    }
+
+    highlightColumnMaxima();
   </script>
 </body>
 </html>
