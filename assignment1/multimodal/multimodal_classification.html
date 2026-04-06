@@ -3,22 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multimodal Classification Report | CLIP & Food-101</title>
+  <meta name="description" content="Multimodal Classification Pipeline using OpenAI CLIP on Food-101 – Zero-Shot vs Few-Shot comparison with interactive results." />
+  <title>Multimodal Classification Report | CLIP &amp; Food-101</title>
+  <link rel="stylesheet" href="../../styles/style.css" />
   <style>
     :root {
-      --bg: #f6f8fc;
-      --surface: #ffffff;
-      --surface-2: #f8fbff;
-      --text: #0f172a;
-      --muted: #475569;
-      --border: rgba(148, 163, 184, 0.25);
-      --primary: #2563eb;
-      --primary-2: #1d4ed8;
-      --soft: #e0e7ff;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --warning: #f59e0b;
-      --shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
       --code-bg: #0b1220;
       --code-surface: #111827;
       --code-border: rgba(148, 163, 184, 0.18);
@@ -27,214 +16,119 @@
       --code-accent: #7dd3fc;
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 28%),
-        radial-gradient(circle at top right, rgba(14,165,233,0.10), transparent 22%),
-        var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    a { color: inherit; }
-    img { max-width: 100%; display: block; border-radius: 18px; }
-
+    /* ── Layout overrides ─────────────────────────── */
     .container {
       width: min(1280px, calc(100% - 32px));
-      margin: 0 auto;
     }
 
     .sub-hero {
-      padding: clamp(56px, 8vw, 88px) 0 clamp(36px, 6vw, 60px);
+      padding: clamp(56px, 8vw, 88px) 0 clamp(40px, 6vw, 64px);
     }
 
-    .hero-shell {
-      width: min(1280px, calc(100% - 32px));
-      margin: 0 auto;
+    .sub-hero .back-link,
+    .sub-hero .eyebrow,
+    .sub-hero h1,
+    .sub-hero .hero-text {
+      max-width: none;
     }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0 0 18px;
-      color: var(--primary);
-      font-weight: 700;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-      font-size: .84rem;
+    .sub-hero h1 {
+      width: min(100%, 15ch);
+      margin-bottom: 16px;
+      font-size: clamp(2.3rem, 4.8vw, 4.4rem);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
     }
 
-    .eyebrow::before {
-      content: "";
-      width: 26px;
-      height: 2px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--primary), #06b6d4);
+    .sub-hero .hero-text {
+      width: min(100%, 92ch);
+      font-size: clamp(1rem, 0.55vw + 0.95rem, 1.16rem);
+      line-height: 1.75;
     }
 
-    .back-link {
+    /* ── Entrance animations ──────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .animate-up {
+      opacity: 0;
+      animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.06s; }
+    .delay-2 { animation-delay: 0.12s; }
+    .delay-3 { animation-delay: 0.18s; }
+    .delay-4 { animation-delay: 0.24s; }
+    .delay-5 { animation-delay: 0.30s; }
+
+    /* ── Hero stat chips ──────────────────────────── */
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .hero-stats .stat-chip {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 18px;
-      text-decoration: none;
-      color: var(--muted);
-      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      color: rgba(248, 250, 252, 0.92);
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    .back-link:hover { color: var(--primary); }
-
-    h1 {
-      margin: 0 0 14px;
-      width: min(100%, 15ch);
-      font-size: clamp(2.4rem, 5vw, 4.5rem);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
+    .hero-stats .stat-chip:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.28);
     }
 
-    h2 {
-      margin: 0 0 14px;
-      font-size: clamp(1.3rem, 1vw + 1rem, 1.8rem);
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+    .hero-stats .stat-chip .val {
+      color: #c7d2fe;
+      font-weight: 800;
     }
 
-    h3 {
-      margin: 0 0 12px;
-      font-size: 1.08rem;
-      line-height: 1.3;
-    }
-
-    p {
-      margin: 0;
-      color: var(--muted);
-      max-width: 80ch;
-    }
-
-    .hero-text {
-      width: min(100%, 90ch);
-      font-size: clamp(1rem, .5vw + .95rem, 1.14rem);
-      line-height: 1.8;
-    }
-
-    .page-stack {
-      display: grid;
-      gap: 22px;
-      padding-bottom: 64px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 22px;
-    }
-
-    .card, .sub-block {
-      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .card {
-      padding: clamp(20px, 2.2vw, 28px);
-    }
-
-    .sub-block {
-      padding: 20px;
-    }
-
-    .badge-row, .quick-links, .pipeline-nav {
+    /* ── Section nav chips (quick-jump) ───────────── */
+    .section-nav {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
 
-    .soft-badge, .resource-link, .nav-chip {
+    .nav-chip {
       display: inline-flex;
       align-items: center;
-      border-radius: 999px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .soft-badge {
-      background: #eef2ff;
-      color: var(--primary-2);
-      border: 1px solid #c7d2fe;
-      padding: 8px 12px;
-      font-size: .92rem;
-    }
-
-    .resource-link {
-      background: #eff6ff;
-      color: var(--primary-2);
-      border: 1px solid #bfdbfe;
       padding: 10px 14px;
-    }
-
-    .resource-link:hover {
-      background: #dbeafe;
-      text-decoration: none;
-    }
-
-    .overview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-    }
-
-    .overview-item {
-      padding: 16px 16px 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
-      border: 1px solid rgba(191,219,254,0.8);
-    }
-
-    .overview-item p:first-child {
-      font-size: .9rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .overview-value {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
       color: var(--text);
-      font-size: 1.15rem;
-      font-weight: 800;
-      line-height: 1.25;
+      font-weight: 600;
+      text-decoration: none;
+      transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
     }
 
-    .inline-code {
-      display: inline-flex;
-      align-items: center;
-      padding: .16rem .48rem;
-      border-radius: 8px;
-      background: #eff6ff;
-      color: var(--primary-2);
-      font-family: ui-monospace, monospace;
-      font-size: .92em;
+    .nav-chip:hover {
+      text-decoration: none;
+      border-color: #c7d2fe;
+      background: #eef2ff;
+      transform: translateY(-2px);
     }
 
-    .analysis-box {
-      margin-top: 14px;
-      padding: 16px 18px;
-      border-radius: 16px;
-      background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
-      border: 1px solid rgba(191,219,254,.9);
-    }
-
-    .analysis-box p + p { margin-top: 8px; }
-
-    .pipeline-stack {
-      display: grid;
-      gap: 18px;
-    }
-
+    /* ── Code blocks ──────────────────────────────── */
     pre {
       margin: 14px 0 0;
       position: relative;
@@ -243,12 +137,15 @@
       border-radius: 18px;
       border: 1px solid var(--code-border);
       background:
-        linear-gradient(180deg, rgba(148,163,184,.08) 0, rgba(148,163,184,.08) 38px, transparent 38px),
+        linear-gradient(180deg, rgba(148, 163, 184, 0.08) 0, rgba(148, 163, 184, 0.08) 38px, transparent 38px),
         linear-gradient(180deg, var(--code-surface) 0%, var(--code-bg) 100%);
       color: var(--code-text);
-      font-size: .92rem;
+      font-size: clamp(0.84rem, 0.16vw + 0.8rem, 0.96rem);
       line-height: 1.72;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02), 0 16px 32px rgba(15,23,42,.16);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+        0 16px 32px rgba(15, 23, 42, 0.16);
+      scrollbar-color: rgba(125, 211, 252, 0.6) rgba(15, 23, 42, 0.3);
       scrollbar-width: thin;
     }
 
@@ -270,41 +167,57 @@
       top: 11px;
       right: 16px;
       color: var(--code-muted);
-      font-family: ui-monospace, monospace;
-      font-size: .76rem;
-      letter-spacing: .04em;
+      font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.04em;
       text-transform: lowercase;
     }
 
+    code {
+      font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+
+    /* ── Table overrides ──────────────────────────── */
     .table-wrap {
       margin-top: 14px;
-      overflow: auto;
-      border: 1px solid rgba(148,163,184,.18);
+      border: 1px solid rgba(148, 163, 184, 0.18);
       border-radius: 18px;
       background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: .94rem;
+      min-width: 560px;
+      table-layout: auto;
     }
 
     th, td {
-      padding: 12px 14px;
-      text-align: left;
-      border-bottom: 1px solid rgba(226,232,240,.95);
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
+    }
+
+    td:first-child,
+    th:first-child {
+      position: sticky;
+      left: 0;
+      background: inherit;
+      z-index: 1;
     }
 
     thead th {
       position: sticky;
       top: 0;
-      background: #eff6ff;
-      color: var(--text);
-      font-size: .86rem;
+      z-index: 1;
+      background: #f1f5f9;
+      font-size: 0.86rem;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      letter-spacing: 0.04em;
+    }
+
+    tbody tr {
+      transition: background 0.14s ease;
     }
 
     tbody tr:hover td {
@@ -314,58 +227,295 @@
     .max-value {
       display: inline-flex;
       align-items: center;
-      padding: .18rem .5rem;
+      padding: 0.18rem 0.5rem;
       border-radius: 999px;
       background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-      color: var(--primary-2);
+      color: #1d4ed8;
       font-weight: 800;
-      box-shadow: inset 0 0 0 1px rgba(59,130,246,.22);
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.22);
     }
 
-    @media (max-width: 1080px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    /* ── Figure grid (2-col for charts) ───────────── */
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
     }
+
+    .figure-grid .figure-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+
+    .figure-card {
+      margin: 0;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: var(--shadow);
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease;
+    }
+
+    .figure-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.13);
+    }
+
+    .figure-card h4 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .figure-card img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      height: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .figure-card .caption {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    /* ── Prompt bar visualizer ────────────────────── */
+    .prompt-bars {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .prompt-bar {
+      display: grid;
+      grid-template-columns: 260px 1fr 60px;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.92rem;
+    }
+
+    .prompt-bar .label {
+      font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.86rem;
+      color: var(--text);
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prompt-bar .bar-track {
+      height: 28px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .prompt-bar .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+      min-width: 0;
+    }
+
+    .prompt-bar .bar-fill.best {
+      background: linear-gradient(90deg, #059669 0%, #34d399 100%);
+    }
+
+    .prompt-bar .acc {
+      font-weight: 800;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+
+    /* ── Key insight callout ──────────────────────── */
+    .insight-callout {
+      margin-top: 16px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(5, 150, 105, 0.25);
+      background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+    }
+
+    .insight-callout .callout-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #059669;
+    }
+
+    .insight-callout p {
+      margin: 0;
+      color: #064e3b;
+    }
+
+    /* ── Fullsize text overrides ──────────────────── */
+    .card > p,
+    .sub-block > p,
+    .analysis-box p,
+    .plain-list li {
+      max-width: none;
+    }
+
+    /* ── Responsive ───────────────────────────────── */
+    @media (max-width: 1120px) {
+      .container {
+        width: min(1180px, calc(100% - 24px));
+      }
+    }
+
+    @media (max-width: 920px) {
+      .figure-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .figure-grid .figure-card:last-child:nth-child(odd) {
+        grid-column: auto;
+      }
+
+      .prompt-bar {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .prompt-bar .label {
+        text-align: left;
+      }
+
+      .data-layout {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
     @media (max-width: 720px) {
-      h1 { font-size: clamp(2rem, 9vw, 2.9rem); }
+      .container {
+        width: calc(100% - 18px);
+      }
+
+      .hero-content {
+        text-align: center;
+        margin-inline: auto;
+      }
+
+      .sub-hero .back-link {
+        display: inline-flex;
+        justify-content: center;
+        margin-inline: auto;
+      }
+
+      .sub-hero h1 {
+        width: 100%;
+        font-size: clamp(2rem, 9vw, 2.8rem);
+        line-height: 1.1;
+      }
+
+      .sub-hero .hero-text {
+        width: 100%;
+        line-height: 1.68;
+        margin-inline: auto;
+      }
+
+      .sub-hero .eyebrow {
+        justify-content: center;
+      }
+
+      .hero-stats {
+        justify-content: center;
+      }
+
+      .nav-chip {
+        width: 100%;
+        justify-content: center;
+      }
+
+      pre {
+        padding: 48px 14px 16px;
+        border-radius: 16px;
+        font-size: 0.84rem;
+      }
+
+      pre::after {
+        right: 12px;
+        font-size: 0.72rem;
+      }
+
+      th, td {
+        padding: 10px 12px;
+        font-size: 0.92rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero-text {
+        font-size: 0.98rem;
+      }
+
+      table {
+        min-width: 520px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- ═══════════════════ HERO ═══════════════════ -->
   <header class="sub-hero">
     <div class="hero-shell">
-      <a class="back-link" href="../assignment1.html">← Assignment 1</a>
-      <p class="eyebrow">Assignment 1 / Multimodal</p>
-      <h1>Multimodal Classification Pipeline</h1>
-      <p class="hero-text">
-        Interactive summary extracted from <span class="inline-code">multimodal_classification.ipynb</span>.
-        This page outlines the comparison between Zero-Shot prediction and Few-Shot fine-tuning using OpenAI's CLIP on the Food-101 dataset.
-      </p>
+      <div class="hero-content">
+        <a class="back-link animate-up" href="../assignment1.html">← Assignment 1</a>
+        <p class="eyebrow animate-up delay-1">Assignment 1 / Multimodal</p>
+        <h1 class="animate-up delay-2">Multimodal Classification Pipeline</h1>
+        <p class="hero-text animate-up delay-3">
+          Interactive summary extracted from
+          <span class="inline-code">multimodal_classification.ipynb</span>.
+          This page outlines the comparison between Zero-Shot prediction and Few-Shot fine-tuning using OpenAI's CLIP on the Food-101 dataset.
+        </p>
+        <div class="hero-stats animate-up delay-4">
+          <span class="stat-chip">Zero-Shot <span class="val">91.44%</span></span>
+          <span class="stat-chip">Few-Shot K=16 <span class="val">94.04%</span></span>
+          <span class="stat-chip">Best Prompt <span class="val">96.22%</span></span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="container page-stack">
-    <section class="grid-2">
-      <article class="card">
+  <!-- ═══════════════════ MAIN ═══════════════════ -->
+  <main class="container section-gap page-stack">
+
+    <!-- ── Notebook Assets + Conclusion ─────────── -->
+    <section class="grid-2 animate-up delay-4">
+      <article class="card" id="assets">
         <h2>Notebook Assets</h2>
         <div class="quick-links">
           <a class="resource-link" href="./multimodal_classification.ipynb">Open source notebook</a>
           <a class="resource-link" href="../assignment1.html">Back to assignment topics</a>
         </div>
-        <div class="badge-row" style="margin-top: 14px;">
+        <div class="badge-row">
           <span class="soft-badge">Dataset: Food-101 (20 Classes)</span>
-          <span class="soft-badge">Base Model: OpenAi CLIP</span>
+          <span class="soft-badge">Base Model: OpenAI CLIP</span>
           <span class="soft-badge">Tasks: Zero-Shot vs Few-Shot</span>
         </div>
       </article>
 
-      <article class="card">
+      <article class="card" id="conclusion">
         <h2>Conclusion</h2>
         <p>
-          The notebook showcases the incredible power of Vision-Language models like CLIP. 
-          Without a single gradient update on the subset, the <strong>Zero-Shot baseline</strong> using a generic prompt achieved over 91% accuracy. 
+          The notebook showcases the incredible power of Vision-Language models like CLIP.
+          Without a single gradient update on the subset, the <strong>Zero-Shot baseline</strong> using a generic prompt achieved over 91% accuracy.
           Both Linear Probes and MLPs applied over frozen features improved performance consistently up to <strong>94% on 16 shots</strong>.
         </p>
-        <div class="analysis-box">
+        <div class="analysis-box" style="margin-top: 14px;">
           <p>
             However, the most significant discovery was that simply tuning the text prompt mapping—from "a photo of {class}" to <span class="inline-code">"a delicious {class}"</span>—yielded an astounding <strong>96.22% Zero-Shot accuracy</strong>. This implies that careful prompt engineering alone can surpass the performance of explicit few-shot fine-tuning on downstream heads.
           </p>
@@ -373,43 +523,139 @@
       </article>
     </section>
 
-    <section class="card">
-      <h2>Project Snapshot</h2>
-      <div class="overview-grid">
-        <div class='overview-item'><p>Target Classes</p><p class='overview-value'>20 (Subset)</p></div>
-        <div class='overview-item'><p>Base Zero-Shot</p><p class='overview-value'>91.44%</p></div>
-        <div class='overview-item'><p>Best Few-Shot (K=16)</p><p class='overview-value'>94.04%</p></div>
-        <div class='overview-item'><p>Best Prompt Result</p><p class='overview-valuemax-value'><span class="max-value">96.22%</span></p></div>
+    <!-- ── Quick Navigation ────────────────────── -->
+    <section class="card animate-up delay-5" id="nav-section">
+      <h2>Quick Navigation</h2>
+      <div class="section-nav">
+        <a class="nav-chip" href="#pipeline">Pipeline Overview</a>
+        <a class="nav-chip" href="#snapshot">Project Snapshot</a>
+        <a class="nav-chip" href="#data-glimpse">Data Glimpse</a>
+        <a class="nav-chip" href="#class-distribution">Class Distribution</a>
+        <a class="nav-chip" href="#zero-shot">Zero-Shot Results</a>
+        <a class="nav-chip" href="#few-shot">Few-Shot Results</a>
+        <a class="nav-chip" href="#confusion">Confusion Matrices</a>
+        <a class="nav-chip" href="#per-class">Per-Class Accuracy</a>
+        <a class="nav-chip" href="#gradcam">Grad-CAM</a>
+        <a class="nav-chip" href="#misclassified">Misclassified Examples</a>
+        <a class="nav-chip" href="#prompt-eng">Prompt Engineering</a>
       </div>
     </section>
 
-    <section class="card">
+    <!-- ── Pipeline Overview ────────────────────── -->
+    <section class="card" id="pipeline">
+      <h2>Pipeline Overview</h2>
+      <p style="margin-bottom: 16px;">The diagram below illustrates how CLIP performs multimodal classification: food images and text prompts are independently encoded into a shared 512-dimensional space, then compared via cosine similarity to produce a prediction.</p>
+      <figure class="figure-card" style="margin: 0; padding: 20px; background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);">
+        <img src="./assets/pipeline.svg" alt="CLIP Multimodal Classification Pipeline Diagram" style="width: 100%; height: auto; border: none; background: transparent;" />
+      </figure>
+    </section>
+
+    <!-- ── Project Snapshot ────────────────────── -->
+    <section class="card" id="snapshot">
+      <h2>Project Snapshot</h2>
+      <div class="overview-grid">
+        <div class="overview-item">
+          <p>Target Classes</p>
+          <p class="overview-value">20 (Subset)</p>
+        </div>
+        <div class="overview-item">
+          <p>Base Zero-Shot</p>
+          <p class="overview-value">91.44%</p>
+        </div>
+        <div class="overview-item">
+          <p>Best Few-Shot (K=16)</p>
+          <p class="overview-value">94.04%</p>
+        </div>
+        <div class="overview-item">
+          <p>Best Prompt Result</p>
+          <p class="overview-value"><span class="max-value">96.22%</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Data Glimpse ────────────────────────── -->
+    <section class="card" id="data-glimpse">
       <h2>Data Glimpse</h2>
-      <div class="data-example" style="display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: flex-start;">
-        <img src="./assets/img_1.png" alt="Food-101 Data Glimpse" style="border-radius: 22px; border: 1px solid rgba(148,163,184,.2); box-shadow: 0 16px 36px rgba(15,23,42,.12); max-width: 100%;" />
+      <div class="data-layout" style="display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: flex-start;">
+        <figure class="figure-card" style="margin: 0;">
+          <img src="./assets/img_1.png" alt="Food-101 sample images from each class" />
+        </figure>
         <div>
-          <p>The Food-101 subset consists of 20 challenging categories. The random sample grid above shows that the dataset contains a wide variety of food textures, lighting conditions, and plating styles.</p>
-          <div class="analysis-box">
+          <p>The Food-101 subset consists of 20 challenging categories. The random sample grid shows that the dataset contains a wide variety of food textures, lighting conditions, and plating styles — from close-up sushi to overhead pizza shots.</p>
+          <div class="analysis-box" style="margin-top: 14px;">
             <p>Because CLIP is a zero-shot model that relies on natural language, visual characteristics like plates or zoom-levels don't degrade performance as severely as they do for models trained from scratch on small datasets.</p>
+          </div>
+          <div class="insight-callout">
+            <div class="callout-label">💡 Key Insight</div>
+            <p>CLIP's vision-language alignment means it can generalize across visual styles that would confuse a traditional CNN — making it ideal for food classification where plating varies wildly.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Results Comparison</h2>
+    <!-- ── Class Distribution ──────────────────── -->
+    <section class="card" id="class-distribution">
+      <h2>Class Distribution</h2>
       <div class="pipeline-stack">
         <div class="sub-block">
-          <h3>Few-Shot Approach: Linear Probe vs Adapter</h3>
+          <h3>Train &amp; Test Set Balance</h3>
+          <p>
+            The Food-101 subset is remarkably balanced, with each of the 20 classes containing approximately 750 training samples and 250 test samples. This balance ensures that accuracy alone is a meaningful metric (though we also report weighted F1 for completeness).
+          </p>
+          <figure class="figure-card" style="margin-top: 14px;">
+            <img src="./assets/img_0.png" alt="Train and Test Set Class Distribution" />
+            <p class="caption">Horizontal bar chart showing near-uniform class distribution across both train and test splits.</p>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Zero-Shot Results ───────────────────── -->
+    <section class="card" id="zero-shot">
+      <h2>Zero-Shot Classification</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Baseline: "a photo of {class}"</h3>
+          <p>
+            Without any training data, CLIP achieves <strong>91.44% accuracy</strong> and <strong>89.67% weighted F1</strong> using the default prompt template. This establishes a strong baseline that few-shot methods must outperform to justify the additional complexity.
+          </p>
+          <pre><code>Zero-Shot Accuracy: 0.9144
+Zero-Shot Weighted F1: 0.8967
+
+Prompt template: "a photo of {class_name}"</code></pre>
+          <div class="analysis-box" style="margin-top: 14px;">
+            <p>A 91%+ zero-shot baseline is remarkable – it shows that CLIP has already learned strong food representations during its web-scale contrastive pretraining.</p>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <h3>Zero-Shot Confusion Matrix</h3>
+          <p>
+            The confusion matrix reveals that most classes are cleanly separated. The main confusion hotspot is <strong>waffles ↔ apple pie</strong> (49 misclassifications), likely because both visually feature golden-brown baked surfaces.
+          </p>
+          <figure class="figure-card" style="margin-top: 14px;">
+            <img src="./assets/img_3.png" alt="Zero-Shot Confusion Matrix" />
+            <p class="caption">Confusion matrix for zero-shot CLIP classification. Diagonal dominance confirms strong performance across all 20 classes.</p>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Few-Shot Results ────────────────────── -->
+    <section class="card" id="few-shot">
+      <h2>Few-Shot Fine-Tuning</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Linear Probe vs Adapter (MLP)</h3>
           <p>
             By extracting the 512-dimensional CLIP embedding, we trained simple classification heads on very limited data (from 1 shot up to 16 shots per class). Both methods scale cleanly, with the linear probe offering exceptional simplicity.
           </p>
-          <figure class="figure-card" style="margin-top: 14px; margin-bottom: 20px; background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%); border: 1px solid var(--border); border-radius: 24px; padding: 16px; box-shadow: var(--shadow);">
-            <img src="./assets/img_4.png" alt="Accuracy vs Shots Chart" style="width: 100%; border-radius: 12px;" />
-            <p class="caption" style="margin-top: 10px; font-size: 0.92rem; color: var(--muted);">Accuracy scaling from K=1 to K=16 shots. Both adapters and linear probes scale cleanly with more data.</p>
+          <figure class="figure-card" style="margin-top: 14px;">
+            <img src="./assets/img_4.png" alt="Accuracy vs Number of Shots chart" />
+            <p class="caption">Accuracy and F1 scaling from K=1 to K=16 shots. The dashed red line marks the zero-shot baseline. Both adapters and linear probes scale cleanly with more data.</p>
           </figure>
 
-          <div class="table-wrap">
+          <div class="table-wrap" style="margin-top: 18px;">
             <table>
               <thead>
                 <tr>
@@ -447,8 +693,8 @@
                 <tr>
                   <td>Linear Probe</td>
                   <td>16</td>
-                  <td>0.9400</td>
-                  <td>0.9397</td>
+                  <td><span class="max-value">0.9400</span></td>
+                  <td><span class="max-value">0.9397</span></td>
                 </tr>
                 <tr>
                   <td>Adapter (MLP)</td>
@@ -459,45 +705,287 @@
                 <tr>
                   <td>Adapter (MLP)</td>
                   <td>16</td>
-                  <td>0.9404</td>
-                  <td>0.9401</td>
+                  <td><span class="max-value">0.9404</span></td>
+                  <td><span class="max-value">0.9401</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
 
-        <div class="sub-block">
-          <h3>Visualizing CLIP Attention (Grad-CAM)</h3>
-          <p>
-            By extracting the attention maps from the final Transformer block of the CLIP image encoder, we can see how the model "looks" at food. The visualization proves that the model successfully attends to the semantic clusters (the food itself) rather than background plates or noise.
-          </p>
-          <figure class="figure-card" style="margin-top: 14px; background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%); border: 1px solid var(--border); border-radius: 24px; padding: 16px; box-shadow: var(--shadow);">
-            <img src="./assets/img_8.png" alt="Grad-CAM Attention Map" style="width: 100%; border-radius: 12px;"/>
-            <p class="caption" style="margin-top: 10px; font-size: 0.92rem; color: var(--muted);">High-attention regions highlight the exact spatial location of the predicted food class without any bounding box supervision.</p>
-          </figure>
+          <div class="analysis-box" style="margin-top: 14px;">
+            <p>At K=16, both methods converge to ~94% accuracy — only marginal gains over the zero-shot baseline. This suggests CLIP's pretrained features are already highly discriminative for this food domain.</p>
+          </div>
         </div>
+      </div>
+    </section>
 
+    <!-- ── Confusion Matrices Comparison ────────── -->
+    <section class="card" id="confusion">
+      <h2>Confusion Matrix Comparison</h2>
+      <div class="pipeline-stack">
         <div class="sub-block">
-          <h3>The Power of Prompt Engineering</h3>
+          <h3>Zero-Shot CLIP vs Linear Probe (K=16)</h3>
           <p>
-            Instead of training a model with additional data, we can guide CLIP's text encoder by providing more contextual templates. Below are the zero-shot accuracy iterations:
+            Side-by-side confusion matrices reveal how few-shot training redistributes errors. The linear probe resolves most waffles/apple_pie confusion but introduces minor new confusions in other classes.
           </p>
-          <pre><code>Template: 'a photo of {}' → Accuracy: 0.9144, F1: 0.8967
-Template: 'a photograph of {}' → Accuracy: 0.9338, F1: 0.9291
-Template: 'an image of {}' → Accuracy: 0.9536, F1: 0.9533
-Template: 'a picture of {} food' → Accuracy: 0.9550, F1: 0.9549
-Template: 'a close-up photo of {}, a type of food' → Accuracy: 0.9608, F1: 0.9606
-Template: '{}, a food dish' → Accuracy: 0.9618, F1: 0.9617
-Template: 'a restaurant photo of {}' → Accuracy: 0.9588, F1: 0.9587
-Template: 'a delicious {}' → Accuracy: 0.9622, F1: 0.9621</code></pre>
-          <figure class="figure-card" style="margin-top: 14px; background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%); border: 1px solid var(--border); border-radius: 24px; padding: 16px; box-shadow: var(--shadow);">
-            <img src="./assets/img_11.png" alt="Prompt Engineering Results" style="width: 100%; border-radius: 12px;"/>
-            <p class="caption" style="margin-top: 10px; font-size: 0.92rem; color: var(--muted);">The chart highlights how the simple linguistic shift to "a delicious {}" significantly out-performs standard templates.</p>
+          <figure class="figure-card" style="margin-top: 14px;">
+            <img src="./assets/img_5.png" alt="Confusion Matrix Comparison: Zero-Shot vs Linear Probe K=16" />
+            <p class="caption">Left: Zero-Shot CLIP. Right: Linear Probe (K=16). Both show strong diagonals; the fine-tuned head resolves the waffles ambiguity.</p>
           </figure>
         </div>
       </div>
     </section>
+
+    <!-- ── Per-Class Accuracy ──────────────────── -->
+    <section class="card" id="per-class">
+      <h2>Per-Class Accuracy Breakdown</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Zero-Shot vs Few-Shot (Linear Probe K=16)</h3>
+          <p>
+            The grouped bar chart below compares per-class accuracy between the zero-shot baseline and the best few-shot model. Most classes perform above 90% for both approaches. The notable exception is <strong>waffles</strong>, where zero-shot performs poorly (~3%) due to confusion with apple pie, but the linear probe recovers well.
+          </p>
+          <figure class="figure-card" style="margin-top: 14px;">
+            <img src="./assets/img_6.png" alt="Per-Class Accuracy: Zero-Shot vs Few-Shot" />
+            <p class="caption">Grouped bar chart showing per-class accuracy for both methods. The waffles class shows the most dramatic improvement with few-shot training.</p>
+          </figure>
+          <div class="insight-callout">
+            <div class="callout-label">💡 Key Insight</div>
+            <p>The waffles class is a fascinating failure mode: zero-shot CLIP confuses waffles with apple pie (both are golden-brown baked items). With just 16 labeled examples, the linear probe learns to distinguish them.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Grad-CAM ────────────────────────────── -->
+    <section class="card" id="gradcam">
+      <h2>Visualizing CLIP Attention (Grad-CAM)</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Where Does CLIP Look?</h3>
+          <p>
+            By extracting the attention maps from the final Transformer block of the CLIP image encoder, we can see how the model "looks" at food. The visualization proves that the model successfully attends to the semantic food regions rather than background plates or noise.
+          </p>
+          <div class="figure-grid" style="margin-top: 14px;">
+            <figure class="figure-card">
+              <h4>Pizza</h4>
+              <img src="./assets/img_8.png" alt="Grad-CAM Attention Map: Pizza" />
+              <p class="caption">Original → Attention Map → Overlay. The model focuses on pizza toppings and crust.</p>
+            </figure>
+            <figure class="figure-card">
+              <h4>Ramen</h4>
+              <img src="./assets/img_7.png" alt="Grad-CAM Attention Map: Ramen" />
+              <p class="caption">Original → Attention Map → Overlay. Attention concentrates on noodles and broth.</p>
+            </figure>
+            <figure class="figure-card">
+              <h4>Fried Rice</h4>
+              <img src="./assets/img_9.png" alt="Grad-CAM Attention Map: Fried Rice" />
+              <p class="caption">Original → Attention Map → Overlay. Highlights the rice grains and mixed ingredients.</p>
+            </figure>
+          </div>
+          <div class="analysis-box" style="margin-top: 16px;">
+            <p>Across all three examples, CLIP's attention maps confirm it localizes food without any bounding box supervision. This spatial awareness is a byproduct of the contrastive pretraining and validates the model's interpretability.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Misclassified Examples ───────────────── -->
+    <section class="card" id="misclassified">
+      <h2>Misclassified Examples</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Zero-Shot Failure Cases</h3>
+          <p>
+            Examining misclassified samples reveals understandable errors: hamburgers confused with steaks (both are meat dishes), hamburgers confused with hot dogs (both are served on buns), and some ambiguous plating styles.
+          </p>
+          <figure class="figure-card" style="margin-top: 14px;">
+            <img src="./assets/img_10.png" alt="Misclassified Examples from Zero-Shot Classification" />
+            <p class="caption">A gallery of zero-shot misclassifications for the hamburger class. Red labels indicate true class and model predictions. Most confusions are semantically plausible (steak, hot dog, french fries — all co-occur in burger meals).</p>
+          </figure>
+          <div class="analysis-box" style="margin-top: 14px;">
+            <p>These "mistakes" are actually quite reasonable — they reflect genuine visual ambiguity. A meal featuring a burger, fries, and steak on one plate will challenge even human classifiers when cropped at certain angles.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Prompt Engineering ───────────────────── -->
+    <section class="card" id="prompt-eng">
+      <h2>The Power of Prompt Engineering</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <h3>Zero-Shot Accuracy by Prompt Template</h3>
+          <p>
+            Instead of training a model with additional data, we can guide CLIP's text encoder by providing more contextual templates. Below are the zero-shot accuracy iterations, visualized as both a bar chart and scaled bars:
+          </p>
+
+          <div class="prompt-bars">
+            <div class="prompt-bar">
+              <span class="label">"a photo of {}"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="91.44"></div></div>
+              <span class="acc">91.44%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"a photograph of {}"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="93.38"></div></div>
+              <span class="acc">93.38%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"an image of {}"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="95.36"></div></div>
+              <span class="acc">95.36%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"a picture of {} food"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="95.50"></div></div>
+              <span class="acc">95.50%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"a close-up photo of {}, a type of food"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="96.08"></div></div>
+              <span class="acc">96.08%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"{}, a food dish"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="96.18"></div></div>
+              <span class="acc">96.18%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"a restaurant photo of {}"</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;" data-target="95.88"></div></div>
+              <span class="acc">95.88%</span>
+            </div>
+            <div class="prompt-bar">
+              <span class="label">"a delicious {}"</span>
+              <div class="bar-track"><div class="bar-fill best" style="width: 0%;" data-target="96.22"></div></div>
+              <span class="acc" style="color: #059669; font-weight: 900;">96.22%</span>
+            </div>
+          </div>
+
+          <figure class="figure-card" style="margin-top: 18px;">
+            <img src="./assets/img_11.png" alt="Prompt Engineering Zero-Shot Accuracy Chart" />
+            <p class="caption">Horizontal bar chart from the notebook showing zero-shot accuracy by prompt template. "a delicious {}" achieves the highest score.</p>
+          </figure>
+
+          <pre style="margin-top: 14px;"><code>Template: 'a photo of {}'                          → Accuracy: 0.9144, F1: 0.8967
+Template: 'a photograph of {}'                      → Accuracy: 0.9338, F1: 0.9291
+Template: 'an image of {}'                          → Accuracy: 0.9536, F1: 0.9533
+Template: 'a picture of {} food'                    → Accuracy: 0.9550, F1: 0.9549
+Template: 'a close-up photo of {}, a type of food'  → Accuracy: 0.9608, F1: 0.9606
+Template: '{}, a food dish'                         → Accuracy: 0.9618, F1: 0.9617
+Template: 'a restaurant photo of {}'                → Accuracy: 0.9588, F1: 0.9587
+Template: 'a delicious {}'                          → Accuracy: 0.9622, F1: 0.9621</code></pre>
+
+          <div class="insight-callout" style="margin-top: 16px;">
+            <div class="callout-label">🏆 Key Takeaway</div>
+            <p>
+              A simple linguistic shift — from <span class="inline-code">"a photo of {}"</span> to <span class="inline-code">"a delicious {}"</span> — yields a <strong>+4.78 percentage point improvement</strong>, surpassing even the best few-shot model (94.04%). This demonstrates that prompt engineering is one of the most cost-effective strategies for improving vision-language model performance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Final Summary ───────────────────────── -->
+    <section class="card">
+      <h2>Summary &amp; Key Findings</h2>
+      <div class="pipeline-stack">
+        <div class="sub-block">
+          <ul class="plain-list">
+            <li><strong>Zero-Shot CLIP</strong> achieves 91.44% on Food-101 (20 classes) without any training — a testament to the power of contrastive pretraining at web scale.</li>
+            <li><strong>Few-Shot fine-tuning</strong> (Linear Probe / MLP Adapter) improves to ~94% with just 16 labeled examples per class, showing clean log-linear scaling with data.</li>
+            <li><strong>Prompt Engineering</strong> alone pushes accuracy to 96.22%, demonstrating that linguistic priors can matter more than additional training data for vision-language models.</li>
+            <li><strong>Grad-CAM visualizations</strong> confirm that CLIP attends to semantically meaningful regions (the food itself), not background artifacts.</li>
+            <li>The most common failure mode — <strong>waffles ↔ apple pie</strong> — reflects genuine visual similarity, not a model flaw.</li>
+          </ul>
+        </div>
+
+        <div class="overview-grid" style="margin-top: 14px;">
+          <div class="overview-item">
+            <p>Approach</p>
+            <p class="overview-value">Zero-Shot CLIP</p>
+          </div>
+          <div class="overview-item">
+            <p>Best Acc.</p>
+            <p class="overview-value"><span class="max-value">96.22%</span></p>
+          </div>
+          <div class="overview-item">
+            <p>Strategy</p>
+            <p class="overview-value">Prompt Tuning</p>
+          </div>
+          <div class="overview-item">
+            <p>Training Cost</p>
+            <p class="overview-value">$0</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
+
+  <!-- ═══════════════════ SCRIPTS ═══════════════ -->
+  <script>
+    // ── Animate prompt bars on scroll ────────────
+    function animatePromptBars() {
+      const bars = document.querySelectorAll('.bar-fill');
+      const minAcc = 90;
+      const maxAcc = 97;
+      const range = maxAcc - minAcc;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            bars.forEach(bar => {
+              const target = parseFloat(bar.dataset.target);
+              const width = ((target - minAcc) / range) * 100;
+              bar.style.width = Math.max(4, Math.min(100, width)) + '%';
+            });
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+
+      const section = document.getElementById('prompt-eng');
+      if (section) observer.observe(section);
+    }
+
+    // ── Animate sections on scroll ──────────────
+    function animateSections() {
+      const cards = document.querySelectorAll('.card, .sub-block');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+      cards.forEach(card => {
+        if (!card.closest('.sub-hero')) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          card.style.transition = 'opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1)';
+          observer.observe(card);
+        }
+      });
+    }
+
+    // ── Smooth scroll for nav chips ─────────────
+    document.querySelectorAll('.nav-chip[href^="#"]').forEach(chip => {
+      chip.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(chip.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Initialize
+    animatePromptBars();
+    animateSections();
+  </script>
 </body>
 </html>
