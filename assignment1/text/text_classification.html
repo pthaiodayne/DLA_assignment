@@ -286,6 +286,128 @@
       line-height: 1.65;
     }
 
+    .pipeline-overview {
+      display: grid;
+      gap: 18px;
+    }
+
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .pipeline-stage {
+      position: relative;
+      overflow: visible;
+      display: grid;
+      gap: 14px;
+      min-height: 170px;
+      padding: 20px 18px 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(37, 99, 235, 0.22);
+      background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+      box-shadow: 0 18px 36px rgba(37, 99, 235, 0.12);
+    }
+
+    .pipeline-stage::before {
+      content: "";
+      position: absolute;
+      inset: auto auto -36px -28px;
+      width: 110px;
+      height: 110px;
+      border-radius: 999px;
+      opacity: 0.22;
+      background: radial-gradient(circle, #60a5fa 0%, rgba(96, 165, 250, 0) 72%);
+    }
+
+    .pipeline-stage:not(:last-child)::after {
+      content: "➜";
+      position: absolute;
+      top: 50%;
+      right: -24px;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      font-size: 1.22rem;
+      font-weight: 900;
+      box-shadow:
+        0 12px 28px rgba(37, 99, 235, 0.34),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.24);
+      z-index: 1;
+    }
+
+    .pipeline-stage-label {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0.32rem 0.7rem;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .pipeline-stage-icon {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #1d4ed8;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.85),
+        0 10px 20px rgba(37, 99, 235, 0.12);
+      backdrop-filter: blur(6px);
+    }
+
+    .pipeline-stage h3 {
+      position: relative;
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.35;
+    }
+
+    .pipeline-detail-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .pipeline-detail-card {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .pipeline-detail-card h4 {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .pipeline-detail-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .pipeline-detail-card li + li {
+      margin-top: 6px;
+    }
+
     .card > p,
     .sub-block > p,
     .analysis-box p,
@@ -306,6 +428,16 @@
     }
 
     @media (max-width: 920px) {
+      .pipeline-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-stage:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -24px;
+        transform: translateX(50%);
+      }
     }
 
     @media (max-width: 720px) {
@@ -400,7 +532,7 @@
       <article class="card">
         <h2>Notebook Assets</h2>
         <div class="quick-links">
-          <a class="resource-link" href="https://colab.research.google.com/drive/1dstmW-cTL0D5mYBxUsF9_Jt0bwxZev00?usp=sharing">Open source notebook</a>
+          <a class="resource-link" href="https://colab.research.google.com/drive/1dstmW-cTL0D5mYBxUsF9_Jt0bwxZev00?usp=sharing">Open Source Notebook</a>
           <a class="resource-link" href="https://huggingface.co/datasets/dair-ai/emotion">Dataset: Emotion</a>
         </div>
         <div class="badge-row">
@@ -449,12 +581,12 @@
     </section>
 
     <section class="card">
-      <h2>Exploratory Data Analysis From The Notebook</h2>
+      <h2>Exploratory Data Analysis</h2>
       <div class="pipeline-stack">
         <div class="sub-block">
           <h3>Dataset Split And Class Distribution</h3>
           <p>
-            The notebook first checks whether the official
+            First, we check whether the official
             <span class="inline-code">emotion</span>
             split is balanced enough for comparison. The split sizes are stable, but the class distribution is clearly imbalanced, especially for
             <span class="inline-code">surprise</span>
@@ -637,6 +769,91 @@
     </section>
 
     <section class="card">
+      <h2>General Pipeline Overview</h2>
+      <div class="pipeline-overview">
+        <p>
+          This slide summarizes the full text classification flow from raw sentence input to the final predicted emotion label. The classical models share manual preprocessing and sequence encoding, while DistilBERT uses its pretrained tokenizer before entering the backbone.
+        </p>
+
+        <div class="pipeline-flow" aria-label="General text classification pipeline">
+          <article class="pipeline-stage">
+            <span class="pipeline-stage-label">Step 1</span>
+            <div class="pipeline-stage-icon">T</div>
+            <h3>Input Text</h3>
+          </article>
+
+          <article class="pipeline-stage">
+            <span class="pipeline-stage-label">Step 2</span>
+            <div class="pipeline-stage-icon">P</div>
+            <h3>Preprocessing</h3>
+          </article>
+
+          <article class="pipeline-stage">
+            <span class="pipeline-stage-label">Step 3</span>
+            <div class="pipeline-stage-icon">B</div>
+            <h3>Backbone</h3>
+          </article>
+
+          <article class="pipeline-stage">
+            <span class="pipeline-stage-label">Step 4</span>
+            <div class="pipeline-stage-icon">C</div>
+            <h3>Classifier Head</h3>
+          </article>
+
+          <article class="pipeline-stage">
+            <span class="pipeline-stage-label">Step 5</span>
+            <div class="pipeline-stage-icon">R</div>
+            <h3>Classification Result</h3>
+          </article>
+        </div>
+
+        <div class="pipeline-detail-grid">
+          <article class="pipeline-detail-card">
+            <h4>Input Text</h4>
+            <ul class="plain-list">
+              <li>Raw text sentences from the Emotion dataset</li>
+            </ul>
+          </article>
+
+          <article class="pipeline-detail-card">
+            <h4>Preprocessing</h4>
+            <ul class="plain-list">
+              <li>lowercase conversion</li>
+              <li>punctuation removal</li>
+              <li>whitespace normalization</li>
+              <li>tokenization</li>
+              <li>encoding and padding for classical models</li>
+              <li>pretrained tokenization for DistilBERT</li>
+            </ul>
+          </article>
+
+          <article class="pipeline-detail-card">
+            <h4>Backbone</h4>
+            <ul class="plain-list">
+              <li>TextCNN for local n-gram feature extraction</li>
+              <li>BiLSTM for bidirectional sequence modeling</li>
+              <li>DistilBERT for contextual language representation</li>
+            </ul>
+          </article>
+
+          <article class="pipeline-detail-card">
+            <h4>Classifier Head</h4>
+            <ul class="plain-list">
+              <li>fully connected layer mapping extracted features to 6 emotion classes</li>
+            </ul>
+          </article>
+
+          <article class="pipeline-detail-card">
+            <h4>Classification Result</h4>
+            <ul class="plain-list">
+              <li>predicted label among: sadness, joy, love, anger, fear, surprise</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>Pipeline Selector</h2>
       <div class="switcher">
         <button id="btn-classical" class="switch-btn active" type="button">CNN / BiLSTM Pipeline</button>
@@ -673,7 +890,7 @@
         <div id="classical-input" class="sub-block">
           <h3>Text Input</h3>
           <p>
-            Both CNN and BiLSTM start from the same raw dataset. The notebook loads
+            Both CNN and BiLSTM start from the same raw dataset. We load the official
             <span class="inline-code">emotion</span>,
             extracts the raw text field, and keeps the official train, validation, and test split unchanged.
           </p>
@@ -690,7 +907,7 @@ print(dataset["train"].features)</code></pre>
         <div id="classical-preprocess" class="sub-block">
           <h3>Data Preprocessing</h3>
           <p>
-            The notebook lowercases text, removes punctuation, normalizes spaces, and tokenizes by whitespace. This same cleaning logic is reused in both CNN and RNN branches.
+            We lowercases text, removes punctuation, normalizes spaces, and tokenizes by whitespace. This same cleaning logic is reused in both CNN and RNN branches.
           </p>
           <pre><code>def clean_text(text):
     text = text.lower()
@@ -786,7 +1003,7 @@ train_loader_rnn = DataLoader(train_dataset_rnn, batch_size=64, shuffle=True)</c
             bidirectional=True
         )</code></pre>
           <p>
-            BiLSTM emphasizes bidirectional sequence context. In theory it should capture order better than CNN, but in this notebook that advantage is not enough to beat the simpler CNN baseline.
+            BiLSTM emphasizes bidirectional sequence context. In theory it should capture order better than CNN, but in this context that advantage is not enough to beat the simpler CNN baseline.
           </p>
         </div>
 
@@ -892,7 +1109,7 @@ def compute_metrics(eval_pred):
             param.requires_grad = True</code></pre>
           <div class="analysis-box">
             <p>
-              This makes the transformer section more rigorous than a single fine-tuning run. The notebook evaluates how much of the pretrained model actually needs to be trainable, and full fine-tuning still gives the strongest final result.
+              This makes the transformer section more rigorous than a single fine-tuning run. Then, we evaluate how much of the pretrained model actually needs to be trainable, and full fine-tuning still gives the strongest final result.
             </p>
           </div>
         </div>
@@ -923,13 +1140,13 @@ def compute_metrics(eval_pred):
         <div id="distilbert-result" class="sub-block">
           <h3>Final DistilBERT Result</h3>
           <p>
-            The best DistilBERT configuration in the notebook reaches
+            The best DistilBERT configuration reaches
             <span class="inline-code">Test Accuracy = 0.9270</span> and
             <span class="inline-code">Test Macro F1 = 0.8796</span>.
           </p>
           <div class="analysis-box">
             <p>
-              This confirms that the largest gain in the notebook comes from moving to pretrained contextual representations rather than only changing the scratch-trained backbone from CNN to BiLSTM.
+              This confirms that the largest gain comes from moving to pretrained contextual representations rather than only changing the scratch-trained backbone from CNN to BiLSTM.
             </p>
           </div>
         </div>
